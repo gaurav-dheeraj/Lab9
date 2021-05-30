@@ -62,7 +62,7 @@
       // for more configuration options, see https://docs.trackjs.com
     });
 
-    TrackJS.track("Testing TrackJS");
+    //TrackJS.track("Testing TrackJS");
   </script>
 
   <script>
@@ -81,7 +81,9 @@
       catch (err) {
         console.log("Sadly an error happened friend");
         output.innerHTML = 0;
-        err.message = "Value converted to NaN"
+        if (err.message !== "Dividing by 0 leads to leads to NaN") {
+          err.message = "Value converted to NaN";
+        }
         console.error(err);
       }
       finally {
@@ -171,17 +173,6 @@
         console.error(err); // ValidationError
       }
     });
-    
-    class CustomError extends Error {
-    constructor(message) {
-      super(message); // (1)
-      this.name = "CustomError"; // (2)
-      }
-    }
-
-    function test() {
-      throw new CustomError("Triggered Global Error");
-    }
 
     window.onerror = function (msg, url, lineNo, columnNo, error) {
       let message = [
@@ -191,13 +182,18 @@
         'Column: ' + columnNo,
         'Error object: ' + JSON.stringify(error)
       ].join(' - ');
-
-      logToConsole(message);
       TrackJS.track(message);
     }
 
-    function logToConsole(message) {
-      console.log(message);
+    class CustomError extends Error {
+    constructor(message) {
+      super(message); // (1)
+      this.name = "CustomError"; // (2)
+      }
+    }
+
+    function test() {
+      throw new CustomError("Triggered Global Error");
     }
   </script>
 </body>
