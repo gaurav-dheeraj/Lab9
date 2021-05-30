@@ -107,7 +107,7 @@
 
     // Console Dir
     errorBtns[2].addEventListener("click", function(){
-      console.dir(errorBtns[2]); // Double check this?
+      console.dir(errorBtns[2]); 
     });
 
     //Console dirxml
@@ -170,7 +170,7 @@
         test();
       } catch (err) {
         console.log("Sadly an error happened friend");
-        console.error(err); // ValidationError
+        console.error(err);
       }
     });
 
@@ -187,8 +187,8 @@
 
     class CustomError extends Error {
     constructor(message) {
-      super(message); // (1)
-      this.name = "CustomError"; // (2)
+      super(message);
+      this.name = "CustomError";
       }
     }
 
