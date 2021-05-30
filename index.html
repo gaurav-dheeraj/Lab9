@@ -28,14 +28,14 @@
 <body>
   <fieldset>
     <legend>Error Calculator</legend>
-    <input type="number" name="first-num" id="first-num" />
+    <input name="first-num" id="first-num" />
     <select name="operator" id="operator">
       <option>+</option>
       <option>-</option>
       <option>*</option>
       <option>/</option>
     </select>
-    <input type="number" name="second-num" id="second-num" />
+    <input name="second-num" id="second-num" />
     <button id="calculate">Calculate</button>
     <br />
     <output></output>
@@ -55,6 +55,16 @@
     <button>Trigger a Global Error</button>
   </section>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({
+      token: "7f8663d89b7c4ef287cd420623396e1b"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+
+    TrackJS.track("Testing TrackJS");
+  </script>
+
   <script>
     let calculateBtn = document.querySelector('#calculate');
     calculateBtn.addEventListener('click', () => {
@@ -62,11 +72,133 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        if(operator === "/" && secondNum == "0"){
+          throw new EvalError("Dividing by 0 leads to leads to NaN");
+        }
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      }
+      catch (err) {
+        console.log("Sadly an error happened friend");
+        output.innerHTML = 0;
+        err.message = "Value converted to NaN"
+        console.error(err);
+      }
+      finally {
+        console.log("Error or not, Here I Come (finally block for step 3)");
+      }
     });
 
+    let logGroupLabel = "Log Group";
+
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
-    // TODO - Make buttons functional
+    
+    // Console log
+    errorBtns[0].addEventListener("click", function(){
+      console.log("Console Log Demo");
+    });
+
+    // Console Error Demo
+    errorBtns[1].addEventListener("click", function(){
+      console.error("Console Error Demo");
+    });
+
+    // Console Dir
+    errorBtns[2].addEventListener("click", function(){
+      console.dir(errorBtns[2]); // Double check this?
+    });
+
+    //Console dirxml
+    errorBtns[3].addEventListener("click", function(){
+      console.dirxml(document.body);
+    });
+
+    // Console Group Start
+    errorBtns[4].addEventListener("click", function () {
+      console.group(logGroupLabel);
+    });
+
+    // Console Group End
+    errorBtns[5].addEventListener("click", function () {
+      console.groupEnd(logGroupLabel);
+    });
+
+    // Console Table
+    errorBtns[6].addEventListener("click", function () {
+      console.table([
+        {
+          name: 'Software Engineering',
+          num: 110,
+        },
+        {
+          name: 'Programming Languages',
+          num: 130,
+        },
+        {
+          name: 'Advanced Software Engineering',
+          num: 112,
+        }
+      ]);
+    });
+
+    //Start Timer
+    errorBtns[7].addEventListener("click", function () {
+      console.log("Timer started!");
+      console.time("Run Time");
+    });
+
+    // End Timer
+    errorBtns[8].addEventListener("click", function () {
+      console.log("Timer ended!");
+      console.timeEnd("Run Time");
+    });
+
+    // Console Trace
+    errorBtns[9].addEventListener("click", function () {
+      const traceTest = () => { deep(); };
+      const deep = () => { deeper(); };
+      const deeper = () => { deepest(); };
+      const deepest = () => { console.trace(); };
+      traceTest();
+    });
+
+    // Trigger a Global Error
+    errorBtns[10].addEventListener("click", function () {
+      try {
+        test();
+      } catch (err) {
+        console.log("Sadly an error happened friend");
+        console.error(err); // ValidationError
+      }
+    });
+    
+    class CustomError extends Error {
+    constructor(message) {
+      super(message); // (1)
+      this.name = "CustomError"; // (2)
+      }
+    }
+
+    function test() {
+      throw new CustomError("Triggered Global Error");
+    }
+
+    window.onerror = function (msg, url, lineNo, columnNo, error) {
+      let message = [
+        'Message: ' + msg,
+        'URL: ' + url,
+        'Line: ' + lineNo,
+        'Column: ' + columnNo,
+        'Error object: ' + JSON.stringify(error)
+      ].join(' - ');
+
+      logToConsole(message);
+      TrackJS.track(message);
+    }
+
+    function logToConsole(message) {
+      console.log(message);
+    }
   </script>
 </body>
 </html>
